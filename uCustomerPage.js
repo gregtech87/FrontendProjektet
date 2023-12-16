@@ -1,7 +1,7 @@
 function displayCustomerDashboard() {
     appContainer.innerHTML = `
       <section>
-        <h2>Welcome "${username}" to Customer Dashboard</h2>
+        <h2>Welcome "${loggedInUsername}" to Customer Dashboard</h2>
           <h1>Välkommen till Reseportalen</h1>
 
     <h2>Resor</h2>

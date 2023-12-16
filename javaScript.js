@@ -1,5 +1,5 @@
 const appContainer = document.getElementById("app");
-let deleteMessageFromBackend;
+
 
 
 let ref1 = document.querySelector("#cus");
@@ -22,8 +22,8 @@ ref4.addEventListener('click', function (){
 
 
 function renderPage(route, user, pass) {
-username = user;
-password = pass;
+loggedInUsername = user;
+loggedInPassword = pass;
     switch (route) {
         case "login":
             displayLoginForm();
@@ -45,12 +45,12 @@ password = pass;
 function displayLoginForm() {
     appContainer.innerHTML = `
       <section id="loginSection" class="loginPage">
-        <form id="loginForm" onsubmit= "login();return false;">
+        <form class="loginForm" id="loginForm" onsubmit= "login();return false;">
           <label for="username">Username:</label>
-          <input type="text" id="username" name="username" required>
+          <input type="text" id="loginUsername" name="username" required>
 
           <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required>
+          <input type="password" id="loginPassword" name="password" required>
 
           <button type="submit" >Login</button>
         </form>
@@ -62,13 +62,14 @@ function displayAdminDashboard() {
 
     appContainer.innerHTML = `
       <section>
-        <h2>Welcome "${username}" to Admin Dashboard</h2>
+        <h2>Welcome "${loggedInUsername}" to Admin Dashboard</h2>
         <!-- Additional content for admin dashboard -->
           <h1>Admin Portal</h1>
   <nav>
         <a href="#" id="customers">Customers</a>
         <a href="#" id="destinations">Destinations</a>
         <a href="#" id="trips">Booked trips</a>
+        <a href="#" id="addCustomers">Add customers</a>
     </nav>
 
     <section id="adminContent">
@@ -81,7 +82,7 @@ function displayAdminDashboard() {
 function displayNotFound() {
     appContainer.innerHTML = `
       <section>
-        <h2>404 User: "${username}" Not Found</h2>
+        <h2>404 User: "${loggedInUsername}" Not Found</h2>
       </section>
     `;
 }
@@ -101,6 +102,11 @@ function createAdminButtons() {
     adminTrip.addEventListener('click', function () {
         loadContent('trips');
     });
+    let ref5 = document.querySelector("#addCustomers");
+    ref5.addEventListener('click', function (){
+        loadContent('addCustomers');
+    });
+
 
 }
 
@@ -110,9 +116,9 @@ function loadContent(topic) {
     switch (topic) {
         case 'customer':
             mainDiv.innerHTML = `
-            <h2>Kunder</h2>
-            <button onclick="addCustomer()" class="stdbutton posbutton">Add Customer</button>
-            <table>
+            <h2>Customers</h2>
+            <button onclick="loadContent('addCustomers')" class="stdbutton posbutton">Add Customer</button>
+            <table class="table-sortable">
                 <thead>
                     <tr>
                         <th>Customer id</th>
@@ -124,6 +130,7 @@ function loadContent(topic) {
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Date Of Birth</th>
+                        <th>Address id</th>
                         <th>Street</th>
                         <th>Postal Code</th>
                         <th>City</th>
@@ -144,7 +151,7 @@ function loadContent(topic) {
                 `
                 <h2>Destinations</h2>
                 <button onclick="addDestination()"  class="stdbutton posbutton">Add Destination</button>
-                <table>
+                <table class="table-sortable">
                     <thead>
                         <tr>
                             <th>Destination id</th>
@@ -167,7 +174,7 @@ function loadContent(topic) {
                 `
                 <h2>Booked Trips</h2>
 <!--                <button onclick="addDestination()"  class="stdbutton posbutton">Add Trip</button> -->
-                <table>
+                <table class="table-sortable">
                     <thead>
                         <tr>
                             <th>Trip id</th>
@@ -191,6 +198,14 @@ function loadContent(topic) {
                 `;
             fetchTrips();
             break;
+        case 'addCustomers':
+            displayAddCustomer(mainDiv);
+            break;
+        case 'updateCustomers':
+            displayAddCustomer(mainDiv);
+            updateCustomer();
+            break;
+
         default:
             mainDiv.innerHTML = `
             < h2 > Page not found < /h2>
@@ -199,11 +214,78 @@ function loadContent(topic) {
     }
 }
 
+function displayAddCustomer(mainDiv) {
+    mainDiv.innerHTML =
+        `
+                <h2>Add Customers lägga till "info, error och success" rutor</h2>
+<!--         <form class="loginForm" id="loginForm" onsubmit= "login();return false;">-->
+<div class="container">
+            <form id="form" onsubmit="saveNewCustomer(event)";return false;>
+                <div class="column one">
+                    <div class="field firstname">
+                        <label for="firstName">Firstname:</label>
+                        <input type="text" name="firstName" id="firstName" placeholder="Firstname" required>
+                    </div>
+                    <div class="field lastname">
+                        <label for="lastName">Lastname:</label>
+                        <input type="text" name="lastName" id="lastName" placeholder="Lastname" required>
+                    </div>
+                    <div class="field username">
+                        <label for="Username">Username:</label>
+                        <input type="text" name="userName" id="Username" maxlength="20" placeholder="Username" required>
+                    </div>
+                    <div class="field password">
+                        <label for="Password">Password:</label>
+                        <input type="password" name="password" id="Password" minlength="8" maxlength="20" placeholder="type a complex password" required>
+                    </div>
+                    <div class="field email">
+                        <label for="Email">Email:</label>
+                        <input type="email" name="email" id="Email"  placeholder="type a valid email" required>
+                    </div>                    
+                    <div class="field">
+                        <label for="postalCode">Postal Code:</label>
+                        <input type="number" id="postalCode" name="postalCode" placeholder="Postal Code" required>
+                    </div>
+                </div>
+                <div class="column two">
+                    <div class="field phone">
+                        <label for="Phone_">Phone:</label>
+                        <input type="tel" name="phone" id="Phone" pattern="[0-9]{10}" placeholder="07########">
+                    </div>
+                    <div class="field dateOfBirth">
+                        <label for="dateOfBirth">Date of birth:</label>
+                        <input type="date" name="dateOfBirth" id="dateOfBirth" required>
+                    </div>                   
+                    <div class="field authority">
+                        <label for="authority">Authority:</label>
+                        <input type="text" id="authority" name="authority" placeholder="Role: admin/user" required> 
+                    </div>                   
+                    <div class="field active">
+                        <label for="active">Active:</label>
+                        <input type="number" id="active" name="active" min="0" max="1" placeholder="1=Enabled, 0=Not enabled" required>
+                    </div>                   
+                    <div class="field">
+                        <label for="street">Address:</label>
+                        <input type="text" id="street" name="street" placeholder="Street" required>
+                    </div>                    
+                    <div class="field">
+                        <label for="city">City:</label>
+                         <input type="text" id="city" name="city" placeholder="City" required>
+                    </div>
+                    
+                </div>
+                <input type="submit" value="register" class="Save" nclick="saveNewCustomer()" return false;o>
+            </form>
+        </div>
+                `;
+}
+
 async function fetchCustomers() {
+    activateSortingForTables();
     const customerTableBody = document.getElementById('customerTableBody');
 
     const url = 'http://localhost:8585/api/v1/customers';
-    const base64 = btoa(`${username}:${password}`);
+    const base64 = btoa(`${loggedInUsername}:${loggedInPassword}`);
     const response = await fetchDataGet(url, base64);
     let data = await response.json();
 
@@ -219,53 +301,54 @@ async function fetchCustomers() {
                         <td>${customer.email}</td>
                         <td>${customer.phone}</td>
                         <td>${customer.dateOfBirth}</td>
+                        <td>${customer.address.id}</td>
                         <td>${customer.address.street}</td>
                         <td>${customer.address.postalCode}</td>
                         <td>${customer.address.city}</td>
                         <td>${customer.trips.length}</td>
                         <td>${customer.active}</td>
                         <td class="editButtons">
-                            <button onclick="updateCustomer(${customer.customerId})" class="stdbutton">Update</button>
+                            <button onclick="loadContent('updateCustomers')" class="stdbutton">Update</button>
                             <button onclick="deleteCustomer(${customer.customerId})" class="stdbutton negbutton">Remove</button>
                         </td>
                     </tr>
                 `;
-        if (customer.trips.length > 0){
-            customerTableBody.innerHTML += `
-            <tr style="background-color: #f2f2f2">
-                <td>Trip id</td>
-                <td>Departure Date</td>
-                <td>Number Of Weeks</td>
-                <td>Total Price(SEK)</td>
-                <td>Total Price(PLN)</td>
-                <td></td>
-                <td>Destination Id</td>
-                <td>Hotell Name</td>
-                <td>Price Per Week (SEK)</td>
-                <td>Country</td>
-                <td>City</td>
-            </tr>
-            `;
-            customer.trips.forEach(trip => {
-                customerTableBody.innerHTML += `
-                             <tr>
-                                <td>${trip.tripId}</td>
-                                <td>${trip.departureDate}</td>
-                                <td>${trip.numberOfWeeks}</td>
-                                <td>${trip.totalPriceSEK}</td>
-                                <td>${trip.totalPricePLN}</td>
-                                <td>-</td>
-                                <td>${trip.destination.id}</td>
-                                <td>${trip.destination.hotellName}</td>
-                                <td>${trip.destination.pricePerWeek}</td>
-                                <td>${trip.destination.country}</td>
-                                <td>${trip.destination.city}</td>
-                    </tr>
-                `;
-            })
+        // if (customer.trips.length > 0){
+        //     customerTableBody.innerHTML += `
+        //     <tr style="background-color: #f2f2f2">
+        //         <td>Trip id</td>
+        //         <td>Departure Date</td>
+        //         <td>Number Of Weeks</td>
+        //         <td>Total Price(SEK)</td>
+        //         <td>Total Price(PLN)</td>
+        //         <td></td>
+        //         <td>Destination Id</td>
+        //         <td>Hotell Name</td>
+        //         <td>Price Per Week (SEK)</td>
+        //         <td>Country</td>
+        //         <td>City</td>
+        //     </tr>
+        //     `;
+        //     customer.trips.forEach(trip => {
+        //         customerTableBody.innerHTML += `
+        //                      <tr>
+        //                         <td>${trip.tripId}</td>
+        //                         <td>${trip.departureDate}</td>
+        //                         <td>${trip.numberOfWeeks}</td>
+        //                         <td>${trip.totalPriceSEK}</td>
+        //                         <td>${trip.totalPricePLN}</td>
+        //                         <td>-</td>
+        //                         <td>${trip.destination.id}</td>
+        //                         <td>${trip.destination.hotellName}</td>
+        //                         <td>${trip.destination.pricePerWeek}</td>
+        //                         <td>${trip.destination.country}</td>
+        //                         <td>${trip.destination.city}</td>
+        //             </tr>
+        //         `;
+        //     })
 
-        }
-        customerTableBody.innerHTML += `<tr style="background: #333333"><td colspan="100%"></td> </tr>`;
+        // }
+        // customerTableBody.innerHTML += `<tr style="background: #333333"><td colspan="100%"></td> </tr>`;
     });
 
 }
@@ -273,19 +356,19 @@ async function fetchCustomers() {
 async function deleteCustomer(customerId) {
 
     const url = 'http://localhost:8585/api/v1/customers/' + customerId;
-    const base64 = btoa(`${username}:${password}`);
+    const base64 = btoa(`${loggedInUsername}:${loggedInPassword}`);
     const response = await fetchDataGet(url, base64);
     let data = await response.json();
     console.log(data);
     console.log(data.userName);
 
 
-    if(data.userName !== username){
+    if(data.userName !== loggedInUsername){
         await fetchDataDelete(url, base64);
         // Uppdatera tabellen efter borttagning
         loadContent('customer');
     } else {
-        confirm("Logged in as \"" + username + "\". Login with different user before deleting user!");
+        confirm("Logged in as \"" + loggedInUsername + "\". Login with different user before deleting user!");
     }
 
 }
@@ -295,10 +378,12 @@ async function deleteCustomer(customerId) {
 
 // *************** DESTINATION STUFF START **********************
 async function fetchDestinations() {
+
+    activateSortingForTables();
     const destinationTableBody = document.getElementById('destinationTableBody');
 
     const url = 'http://localhost:8585/api/v1/trips';
-    const base64 = btoa(`${username}:${password}`);
+    const base64 = btoa(`${loggedInUsername}:${loggedInPassword}`);
     const response = await fetchDataGet(url, base64);
     let data = await response.json();
 
@@ -322,12 +407,12 @@ async function fetchDestinations() {
 async function deleteDestinations(destinationId) {
 
     const url = 'http://localhost:8585/api/v1/destination/' + destinationId;
-    const base64 = btoa(`${username}:${password}`);
-    await fetchDataDelete(url, base64);
+    const base64 = btoa(`${loggedInUsername}:${loggedInPassword}`);
+    let message = await fetchDataDelete(url, base64);
 
-    console.log('dddaaaata: '+deleteMessageFromBackend);
-    if (deleteMessageFromBackend.length > 60){
-        confirm(deleteMessageFromBackend);
+    console.log('dddaaaata: '+ message);
+    if (message.length > 60){
+        confirm(message);
     }
     loadContent('destination');
 }

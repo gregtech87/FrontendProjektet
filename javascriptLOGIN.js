@@ -1,11 +1,11 @@
-let username;
-let password;
+let loggedInUsername;
+let loggedInPassword;
 
 async function login() {
-    username = document.getElementById('username').value;
-    password = document.getElementById('password').value;
+    loggedInUsername = document.getElementById('loginUsername').value;
+    loggedInPassword = document.getElementById('loginPassword').value;
     const url = 'http://localhost:8585/api/v1/customers';
-    const base64 = btoa(`${username}:${password}`);
+    const base64 = btoa(`${loggedInUsername}:${loggedInPassword}`);
 
 
     const response = await fetchDataGet(url, base64);
@@ -15,7 +15,7 @@ async function login() {
     data.forEach(customer => {
         console.log(customer);
         let customerRole;
-        if (customer.userName === username) {
+        if (customer.userName === loggedInUsername) {
             let role = customer.authority;
             if (role.length > 6) {
                 customerRole = role.substring(5);

@@ -24,8 +24,9 @@ async function fetchDataGet(url, credentials) {
 }
 
 async function fetchDataDelete(url, credentials) {
+    let deleteMessageFromBackend;
     try {
-        const response = await fetch(url, {
+        await fetch(url, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -36,6 +37,30 @@ async function fetchDataDelete(url, credentials) {
             .then(data => {
                 deleteMessageFromBackend = data;
             })
+    } catch (error) {
+        console.error('Error: ', error);
+    }
+return deleteMessageFromBackend;
+}
+
+function fetchDataPost(url, credentials, formData) {
+    try {
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${credentials}`
+        },
+        body: JSON.stringify(formData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the server if needed
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     } catch (error) {
         console.error('Error: ', error);
     }
