@@ -77,17 +77,20 @@ th {
 }
 
 .stdbutton{
-    border-radius: 7px;
     background: #03849b;
     /*font-size: large;*/
 }
 
 .posbutton{
-    background: #009d00;
+    background-color: #009d00;
 }
 
 .negbutton{
-    background: #ff3100;
+    background-color: #ff3100;
+}
+
+.neutralBtn {
+    background-color: #f79045;
 }
 
 .table-sortable th {
@@ -141,18 +144,18 @@ th {
     font-weight: 600;
     color: #222;
 }
-#form {
+.form {
     margin: 0 auto;
     background-color: rgb(238 238 238 / 60%);
     width: 50%;
-    min-height: 100%;
+    /*min-height: 100%;*/
     padding: 25px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
 .column {
-    width: 48%;
+    width: 47%;
 }
 .field {
     margin: 10px 0px;
@@ -181,14 +184,22 @@ input {
 input::placeholder {
     color: #a7a7a7;
 }
-input.register {
-    background-color: rgb(0, 153, 153);
-    color: white;
+.saveBackground {
+    background: #87d1de;
+}
+.save {
+
+    /*color: white;*/
     border: 0px;
     border-radius: 5px;
     padding: 12px;
     font-size: 16px;
-    margin: 0 auto;
+    margin: 5px auto;
+    width: fit-content;
+    height: fit-content;
+}
+.save:hover{
+    cursor: pointer;
 }
 .Brief label {
     margin-bottom: 10px;
@@ -201,4 +212,36 @@ textarea {
     border-radius: 5px;
     outline: 0;
     padding:12px;
+}
+
+.btnList {
+    z-index: 55;
+    position: fixed;
+    top: calc(91%);
+    left: calc(35%);
+    display: flex;
+    margin: auto;
+    width: 25%;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.editTripBtnList {
+    display: flex;
+    margin: auto;
+    width: 25%;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.destinatinChoise{
+    position: relative;
+    padding: 12px;
+    margin-top: 10px;
+    width: 94%;
+    font-weight: 600;
+    border: 0px;
+    outline: 0;
+    border-bottom: 1px solid #a7a7a7;
+    border-radius: 5px;
 }

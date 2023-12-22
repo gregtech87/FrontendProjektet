@@ -8,19 +8,66 @@ async function fetchDataGet(url, credentials) {
                 'Authorization': `Basic ${credentials}`
             }
         });
-        console.log(response);
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            new Error(`HTTP error! Status: ${response.status}`);
         } else {
             return response;
         }
     } catch (error) {
         console.error('Error: ', error);
     }
+}
 
-    // return response;
-    // let data = await response.json();
-    // console.log('TESTING: ', data)
+async function fetchDataPost(url, credentials, formData) {
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${credentials}`
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+            new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Success:', data);
+
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+async function fetchDataPut(url, credentials, formData) {
+
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${credentials}`
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+            new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Success:', data);
+
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
 }
 
 async function fetchDataDelete(url, credentials) {
@@ -40,28 +87,5 @@ async function fetchDataDelete(url, credentials) {
     } catch (error) {
         console.error('Error: ', error);
     }
-return deleteMessageFromBackend;
-}
-
-function fetchDataPost(url, credentials, formData) {
-    try {
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${credentials}`
-        },
-        body: JSON.stringify(formData),
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the server if needed
-            console.log('Success:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    } catch (error) {
-        console.error('Error: ', error);
-    }
+    return deleteMessageFromBackend;
 }
