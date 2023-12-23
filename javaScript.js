@@ -377,7 +377,7 @@ function displayUpdateCustomer(mainDiv, customerId) {
                     </div>
                     <div class="field password">
                         <label for="PasswordUpdate">Password:</label>
-                        <input type="password" name="password" id="PasswordUpdate" minlength="8" maxlength="20" placeholder="type a complex password" required>
+                        <input type="text" name="password" id="PasswordUpdate" minlength="8" maxlength="20" placeholder="type a complex password" required>
                     </div>
                     <div class="field email">
                         <label for="EmailUpdate">Email:</label>
@@ -695,6 +695,7 @@ async function fetchTrips() {
 
     data.forEach(customer => {
         customer.trips.forEach(trip => {
+
             tripTableBody.innerHTML += `
                     <tr>
                         <td>${trip.tripId}</td>
@@ -834,7 +835,6 @@ function displayDestinations(mainDiv) {
 }
 
 async function fetchDestinations() {
-    console.log('RUNNIG FETCH')
     activateSortingForTables();
     const destinationTableBody = document.getElementById('destinationTableBody');
 
@@ -962,7 +962,6 @@ async function saveNewDestination(event) {
 }
 
 async function deleteDestinations(destinationId) {
-
     const url = 'http://localhost:8585/api/v1/destination/' + destinationId;
     let message = await fetchDataDelete(url, base64credentials);
 
@@ -1055,7 +1054,14 @@ function formatPassword(password) {
 function autofillForm(form, data) {
     for (const key in data) {
         const inputField = form.querySelector(`[name="${key}"]`);
-        if (inputField) {
+        console.log(inputField.name)
+        if(inputField.name === 'password'){
+            let password = data[key];
+            inputField.value = password.substring(6);
+        } else if(inputField.name === 'authority'){
+            let authority = data[key];
+            inputField.value = authority.substring(5);
+        } else if (inputField) {
             inputField.value = data[key];
         }
     }
