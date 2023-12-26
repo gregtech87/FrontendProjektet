@@ -2,35 +2,37 @@ body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    /*background-color: #f0f0f0;*/
+    background-color: rgba(62, 65, 118, 0.3);
+
 }
 
 header {
-    background-color: #333;
+    background-color: #3e4176;
     color: white;
     text-align: center;
     padding: 1em;
+    display: flex;
 }
 
 section {
     margin: 20px;
     padding: 20px;
-    background-color: #fff;
+    background-color: rgba(62, 65, 118, 0);
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgb(62, 65, 118);
 }
 
 nav {
     display: flex;
     justify-content: center;
-    background-color: #eee;
+    background-color: rgba(247, 144, 69, 0.5);
     padding: 10px;
 }
 
 nav a {
     margin: 0 15px;
     text-decoration: none;
-    color: #333;
+    color: #3e4176;
     font-weight: bold;
 }
 
@@ -59,6 +61,10 @@ th, td {
 }
 th {
     background-color: #f2f2f2;
+}
+
+#start {
+
 }
 
 .loginPage{
@@ -93,6 +99,11 @@ th {
     background-color: #f79045;
 }
 
+.primaryLoginBtn {
+    position: absolute;
+    left: 90%;
+    transform: translateY(-140%);
+}
 .table-sortable th {
     cursor: pointer;
 }

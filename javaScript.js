@@ -33,8 +33,10 @@ function displayLoginForm() {
 
           <label for="password">Password:</label>
           <input type="password" id="loginPassword" name="password" required>
-
-          <button type="submit" >Login</button>
+          <div class="editButtons">
+          <button type="submit" class="save posbutton">Login</button>
+          <button type="button" onclick="renderPage('start')" class="save negbutton">Return</button>
+          </div>
         </form>
       </section>
     `;
@@ -45,27 +47,29 @@ async function login() {
     loggedInPassword = document.getElementById('loginPassword').value;
     base64credentials = btoa(`${loggedInUsername}:${loggedInPassword}`);
     const url = 'http://localhost:8585/api/v1/customers';
-
-    const response = await fetchDataGet(url, base64credentials);
-    let data = await response.json();
-
-    data.forEach(customer => {
-        console.log(customer);
-        let customerRole;
-        if (customer.userName === loggedInUsername) {
-            let role = customer.authority;
-            if (role.length > 6) {
-                customerRole = role.substring(5);
+    try {
+        const response = await fetchDataGet(url, base64credentials);
+        let data = await response.json();
+        data.forEach(customer => {
+            console.log(customer);
+            let customerRole;
+            if (customer.userName === loggedInUsername) {
+                let role = customer.authority;
+                if (role.length > 6) {
+                    customerRole = role.substring(5);
+                }
+                renderPage(customerRole.toLowerCase());
             }
-            renderPage(customerRole.toLowerCase());
-        }
-    });
+        });
+    } catch (e) {
+        renderPage('noRoute',loggedInUsername);
+    }
 }
 
 function logout() {
     loggedInUsername = "";
     loggedInPassword = "";
-    renderPage('login')
+    renderPage('start')
 }
 
 function renderPage(route, user, pass) {
@@ -76,21 +80,21 @@ function renderPage(route, user, pass) {
         case "login":
             displayLoginForm();
             break;
-        case "user":
+        case "start":
             displayCustomerDashboard();
             break;
         case "admin":
             displayAdminDashboard();
             break;
         default:
-            displayNotFound();
+            displayNotFound(loggedInUsername);
     }
 }
 
-function displayNotFound() {
+function displayNotFound(username) {
     appContainer.innerHTML = `
       <section>
-        <h2>404 User: "${loggedInUsername}" Not Found</h2>
+        <h2>404 User: "${username}" Not found or wrong password</h2>
       </section>
     `;
 }
@@ -110,7 +114,14 @@ function displayAdminDashboard() {
         <h2 style="text-align: center">Welcome "${loggedInUsername}" to Admin Dashboard</h2>
       </section>   
       <section id="adminContent">
-        <!-- Content will be loaded dynamically here -->
+      <img src="images/admin.png">
+      <img src="images/admin.png">
+      <img src="images/admin.png">
+      <img src="images/admin.png">
+      <img src="images/admin.png">
+      <img src="images/admin.png">
+      <img src="images/admin.png">
+      <!-- Content will be loaded dynamically here -->
       </section>
     `;
     createAdminButtons();
@@ -175,7 +186,7 @@ function displayCustomers(mainDiv) {
     mainDiv.innerHTML = `
             <h2>Customers</h2>
             <button onclick="loadAdminContent('addCustomers')" class="stdbutton posbutton">Add Customer</button>
-            <table class="table-sortable">
+            <table id="customerTable" class="table-sortable">
                 <thead>
                     <tr>
                         <th>Customer id</th>
@@ -213,9 +224,13 @@ async function fetchCustomers() {
     let data = await response.json();
 
     data.forEach(customer => {
+        let id = customer.customerId;
+        if(customer.customerId < 10){
+            id ='0' + customer.customerId;
+        }
         customerTableBody.innerHTML += `
                     <tr>
-                        <td>${customer.customerId}</td>
+                        <td>${id}</td>
                         <td>${customer.firstName}</td>
                         <td>${customer.lastName}</td>
                         <td>${customer.userName}</td>
@@ -237,6 +252,7 @@ async function fetchCustomers() {
                     </tr>
                 `;
     });
+    sortTableByColumn(document.getElementById('customerTable'), 0, true);
 }
 
 function displayAddCustomer(mainDiv) {
@@ -461,8 +477,8 @@ async function loadUpdateCustomerData(customerId, mainDiv) {
 }
 
 function creatCustomerTripsUpdateFormAndFillThem (mainDiv, tripList, customerId){
-
-    tripList.forEach(trip => {
+    console.log(tripList);
+    tripList.reverse().forEach(trip => {
         let index = trip.tripId;
 
         mainDiv.innerHTML += `
@@ -516,8 +532,8 @@ function creatCustomerTripsUpdateFormAndFillThem (mainDiv, tripList, customerId)
     </div>    
         `;
     });
-
-    tripList.forEach(trip => {
+    console.log(tripList);
+    tripList.reverse().forEach(trip => {
         let index = trip.tripId;
         const tripForm = document.getElementById('formUpdateCustomerTrip'+index);
         const inputField1 = tripForm.querySelector(`[name="${'tripId'}"]`);
@@ -659,7 +675,7 @@ function displayTrips(mainDiv) {
     mainDiv.innerHTML =
                 `
                 <h2>Booked Trips</h2>
-                <table class="table-sortable">
+                <table id="tripsTable" class="table-sortable">
                     <thead>
                         <tr>
                             <th>Trip id</th>
@@ -695,10 +711,13 @@ async function fetchTrips() {
 
     data.forEach(customer => {
         customer.trips.forEach(trip => {
-
+            let id = trip.tripId;
+            if(trip.tripId < 10){
+               id ='0'+trip.tripId;
+            }
             tripTableBody.innerHTML += `
                     <tr>
-                        <td>${trip.tripId}</td>
+                        <td>${id}</td>
                         <td>${trip.departureDate}</td>
                         <td>${trip.numberOfWeeks}</td>
                         <td>${trip.totalPriceSEK}</td>
@@ -717,6 +736,7 @@ async function fetchTrips() {
                 `;
         });
     });
+    sortTableByColumn(document.getElementById('tripsTable'), 0, true);
 }
 
 function displayAddCustomerTrip(mainDiv, customerId) {
@@ -815,7 +835,7 @@ function displayDestinations(mainDiv) {
         `
                 <h2>Destinations</h2>
                 <button onclick="loadAdminContent('addDestination')"  class="stdbutton posbutton">Add Destination</button>
-                <table class="table-sortable">
+                <table id="destinationTable" class="table-sortable">
                     <thead>
                         <tr>
                             <th>Destination id</th>
@@ -843,9 +863,13 @@ async function fetchDestinations() {
     let data = await response.json();
 
     data.forEach(destination => {
+        let id = destination.id;
+        if(destination.id < 10){
+            id ='0' + destination.id;
+        }
         destinationTableBody.innerHTML += `
                     <tr>
-                        <td>${destination.id}</td>
+                        <td>${id}</td>
                         <td>${destination.hotellName}</td>
                         <td>${destination.pricePerWeek}</td>
                         <td>${destination.country}</td>
@@ -857,6 +881,7 @@ async function fetchDestinations() {
                     </tr>
                 `;
     });
+    sortTableByColumn(document.getElementById('destinationTable'), 0, true);
 }
 
 function displayDestinationForm(mainDiv) {
@@ -908,7 +933,7 @@ function displayUpdateDestination(destinationId) {
 async function loadUpdateDestination(destinationId) {
 
     let updateH2 = document.querySelector('#destinationH2');
-    updateH2.innerHTML = 'Update Destination'
+    updateH2.innerHTML = 'Update Destination: ' + destinationId
 
     const url = 'http://localhost:8585/api/v1/destination/' + destinationId;
     const response = await fetchDataGet(url, base64credentials);
@@ -984,6 +1009,7 @@ function sortTableByColumn(table, column, asc = true) {
     const sortedRows = rows.sort((a, b) => {
         const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
         const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+        console.log("aColText:", aColText, "bColText:", bColText);
         return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
     });
     // Remove all existing TRs from the table.
@@ -997,6 +1023,7 @@ function sortTableByColumn(table, column, asc = true) {
     table.querySelectorAll("th").forEach(th => th.classList.remove("th-sort-asc", "th-sort-desc"));
     table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("th-sort-asc", asc);
     table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("th-sort-desc", !asc);
+    // activateSortingForTables();
 }
 
 function activateSortingForTables() {
@@ -1054,15 +1081,16 @@ function formatPassword(password) {
 function autofillForm(form, data) {
     for (const key in data) {
         const inputField = form.querySelector(`[name="${key}"]`);
-        console.log(inputField.name)
-        if(inputField.name === 'password'){
-            let password = data[key];
-            inputField.value = password.substring(6);
-        } else if(inputField.name === 'authority'){
-            let authority = data[key];
-            inputField.value = authority.substring(5);
-        } else if (inputField) {
-            inputField.value = data[key];
+        if (inputField) {
+            if (inputField.name === 'password') {
+                let password = data[key];
+                inputField.value = password.substring(6);
+            } else if (inputField.name === 'authority') {
+                let authority = data[key];
+                inputField.value = authority.substring(5);
+            } else {
+                inputField.value = data[key];
+            }
         }
     }
 }
@@ -1103,6 +1131,97 @@ async function fetchCurrency(totalSEK, currency) {
     const url = 'http://localhost:8585/api/v1/currency/' + totalSEK + '/' + currency;
     const response = await fetchDataGet(url, base64credentials);
     return await response.json();
+}
+
+async function fetchDataGet(url, credentials) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Basic ${credentials}`
+            }
+        });
+        if (!response.ok) {
+            new Error(`HTTP error! Status: ${response.status}`);
+        } else {
+            return response;
+        }
+    } catch (error) {
+        console.error('Error: ', error);
+    }
+}
+
+async function fetchDataPost(url, credentials, formData) {
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${credentials}`
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+            new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Success:', data);
+
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+async function fetchDataPut(url, credentials, formData) {
+
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${credentials}`
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+            new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Success:', data);
+
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+async function fetchDataDelete(url, credentials) {
+    let deleteMessageFromBackend;
+    try {
+        await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Basic ${credentials}`
+            }
+        })
+            .then(response => response.text())
+            .then(data => {
+                deleteMessageFromBackend = data;
+            })
+    } catch (error) {
+        console.error('Error: ', error);
+    }
+    return deleteMessageFromBackend;
 }
 
 // *************** OTHER STUFF END **********************
