@@ -849,7 +849,7 @@ function displayAddCustomerTrip(mainDiv, customerId) {
                 <label for="dest">Select Destination: </label>
                 <select id="dest" class="destinationChoice" required>
                     <option value="" disabled selected hidden>-- Destination --</option>
-                <select> 
+                </select> 
             </div>
             <div class="field">
                 <label for="numberOfWeeksTrip">Number Of Weeks:</label>
