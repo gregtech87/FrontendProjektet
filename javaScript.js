@@ -61,6 +61,9 @@ async function login() {
 function logout() {
     loggedInUsername = "";
     loggedInPassword = "";
+    updatedCustomer = {};
+    updatedCustomerAddress = {};
+    updatedCustomerTrips = {};
     renderPage('start')
 }
 
@@ -508,7 +511,7 @@ async function loadUpdateCustomerData(customerId, mainDiv) {
     const customerForm = document.getElementById('formUpdateCustomer');
     const addressForm = document.getElementById('formUpdateCustomerAddress');
 
-    // // Autofill forms with JSON data
+    // Autofill forms with JSON data
     autofillForm(customerForm, customer);
     autofillForm(addressForm, customer.address);
 
