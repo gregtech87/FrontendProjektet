@@ -229,13 +229,9 @@ async function fetchCustomers() {
     let data = await response.json();
 
     data.forEach(customer => {
-        let id = customer.customerId;
-        if (customer.customerId < 10) {
-            id = '0' + customer.customerId;
-        }
         customerTableBody.innerHTML += `
                     <tr>
-                        <td>${id}</td>
+                        <td>${customer.customerId}</td>
                         <td>${customer.firstName}</td>
                         <td>${customer.lastName}</td>
                         <td>${customer.userName}</td>
@@ -763,23 +759,15 @@ async function fetchTrips() {
 
     data.forEach(customer => {
         customer.trips.forEach(trip => {
-            let id = trip.tripId;
-            if (trip.tripId < 10) {
-                id = '0' + trip.tripId;
-            }
-            let id2 = trip.destination.id;
-            if (trip.destination.id < 10) {
-                id2 = '0' + trip.destination.id;
-            }
             tripTableBody.innerHTML += `
                     <tr>
-                        <td>${id}</td>
+                        <td>${trip.tripId}</td>
                         <td>${trip.departureDate}</td>
                         <td>${trip.numberOfWeeks}</td>
                         <td>${trip.totalPriceSEK.toFixed(2)}</td>
                         <td>${trip.totalPricePLN.toFixed(2)}</td>
                         <td>-</td>
-                        <td>${id2}</td>
+                        <td>${trip.destination.id}</td>
                         <td>${trip.destination.hotellName}</td>
                         <td>${trip.destination.pricePerWeek}</td>
                         <td>${trip.destination.country}</td>
@@ -895,13 +883,9 @@ async function fetchDestinations() {
     let data = await response.json();
 
     data.forEach(destination => {
-        let id = destination.id;
-        if (destination.id < 10) {
-            id = '0' + destination.id;
-        }
         destinationTableBody.innerHTML += `
                     <tr>
-                        <td>${id}</td>
+                        <td>${destination.id}</td>
                         <td>${destination.hotellName}</td>
                         <td>${destination.pricePerWeek}</td>
                         <td>${destination.city}</td>
@@ -1321,7 +1305,17 @@ function sortTableByColumn(table, column, asc = true) {
     const sortedRows = rows.sort((a, b) => {
         const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
         const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
-        return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
+        // return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
+        // Check if the column text is a number
+        const isNumber = !isNaN(parseFloat(aColText)) && isFinite(aColText);
+
+        if (isNumber) {
+            // If it's a number, convert to numbers and compare
+            return (parseFloat(aColText) - parseFloat(bColText)) * dirModifier;
+        } else {
+            // If it's not a number, compare as strings
+            return aColText.localeCompare(bColText) * dirModifier;
+        }
     });
     // Remove all existing TRs from the table.
     while (tBody.firstChild) {
@@ -1334,7 +1328,6 @@ function sortTableByColumn(table, column, asc = true) {
     table.querySelectorAll("th").forEach(th => th.classList.remove("th-sort-asc", "th-sort-desc"));
     table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("th-sort-asc", asc);
     table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("th-sort-desc", !asc);
-    // activateSortingForTables();
 }
 
 function activateSortingForTables() {
